@@ -14,7 +14,7 @@
           </div><!-- /.col -->
           <div class="col-sm-6">
             <ol class="breadcrumb float-sm-right">
-              <li class="breadcrumb-item"><a href="#">에러명</a></li>
+              <li class="breadcrumb-item">에러명</li>
               <li class="breadcrumb-item active">${exception.getMessage()}</li>
             </ol>
           </div><!-- /.col -->
@@ -22,21 +22,19 @@
       </div><!-- /.container-fluid -->
     </div>
     <!-- /.content-header -->
-
     <!-- Main content -->
     <div class="content">
-    <p><a href='<c:out value="${prevPage}"/>'>이전페이지로 가기</a>
-<p> 에러 상세 내역 </p>
-<ul>
-<c:forEach items="${exception.getStackTrace()}" var="stack">
-<li>${stack.toString()}</li>
-</c:forEach>
-
-</ul>
+    <p><a href='<c:out value="${prevPage}" />'>이전 페이지로 가기</a>
+    <p>에러 상세내역</p>
+    <ul>
+    <c:forEach items="${exception.getStackTrace()}" var="stack">
+    	<li>${stack.toString()}</li>
+    </c:forEach>
+    
+    
+    </ul>
     </div>
     <!-- /.content -->
   </div>
   <!-- /.content-wrapper -->
-
-
 <%@ include file="include/footer.jsp" %> 

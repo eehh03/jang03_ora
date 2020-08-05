@@ -1,29 +1,23 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-    <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-    <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>    
 <%@ include file="../include/header.jsp" %>
 
-	<!-- container -->
+<!-- container -->
 	<div id="container">
-		<!-- location_area -->
-		<div class="location_area customer">
-			<div class="box_inner">
-				<h2 class="tit_page">스프링 <span class="in">in</span> 자바</h2>
-				<p class="location">고객센터 <span class="path">/</span> 공지사항</p>
-				<ul class="page_menu clear">
-					<li><a href="#" class="on">공지사항</a></li>
-					<li><a href="#">문의하기</a></li>
-				</ul>
-			</div>
-		</div>	
-		<!-- //location_area -->
+		<%@ include file="../include/container_header.jsp" %>
 
 		<!-- bodytext_area -->
 		<div class="bodytext_area box_inner">
-			<form action="#" class="minisrch_form">
+			<form action="/board/list" class="minisrch_form">
 				<fieldset>
 					<legend>검색</legend>
+					<select name="searchBoard" class="select_common" disabled>
+                      <option value="">게시판선택</option>
+                      <option value="notice" <c:out value="${(session_bod_type eq 'notice')?('selected'):('')}" />>공지사항</option>
+                      <option value="gallery" <c:out value="${(session_bod_type eq 'gallery')?('selected'):('')}" />>겔러리</option>
+                    </select>
 					<input name="searchType" type="hidden" value="all">
 					<input name="searchKeyword" type="text" class="tbox" title="검색어를 입력해주세요" placeholder="검색어를 입력해주세요">
 					<button type="submit" class="btn_srch">검색</button>
@@ -40,39 +34,38 @@
 					</tr>
 				</thead>
 				<tbody>
-				<c:forEach items="${boardList}" var="boardVO" varStatus="status">
-                  <tr>
-                      <td>${boardVO.bno}</td>
+					<c:forEach items="${boardList}" var="boardVO" varStatus="status">
+                    <tr>
+                      <td>${boardVO.rnum}</td>
                       <td><a href="/board/view?bno=${boardVO.bno}&page=${pageVO.page}">${boardVO.title}</a></td>
                       <td><span class="badge badge-danger right">${boardVO.view_count}</span></td>
                       <td><span class="tag tag-success">
-                     <fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${boardVO.regdate}"/> 
+                      <fmt:formatDate pattern="yyyy-MM-dd HH:mm" value="${boardVO.regdate}" />
                       </span></td>
-                     
                     </tr>
-                  </c:forEach>  
+                    </c:forEach>
 				</tbody>
 			</table>
 			<!-- pagination -->
-         <div class="pagination">
-            <c:if test="${pageVO.prev}">
-            <a href="/board/list?page=${pageVO.startPage-1}&searchType=${pageVO.searchType}&searchKeyword=${pageVO.searchKeyword}" class="prevpage  pbtn"><img src="/resources/home/img/btn_prevpage.png" alt="이전 페이지로 이동"></a>
-            </c:if>
-            <c:forEach begin="${pageVO.startPage}" end="${pageVO.endPage}" var="idx">
-            <a href="/board/list?page=${idx}&searchType=${pageVO.searchType}&searchKeyword=${pageVO.searchKeyword}"><span class="pagenum <c:out value="${idx==pageVO.page?'currentpage':''}"/>">${idx}</span></a>
-            </c:forEach>
-            <c:if test="${pageVO.next}">
-            <a href="/board/list?page=${pageVO.endPage+1}&searchType=${pageVO.searchType}&searchKeyword=${pageVO.searchKeyword}" class="nextpage  pbtn"><img src="/resources/home/img/btn_nextpage.png" alt="다음 페이지로 이동"></a>
-            </c:if>
-         </div>
-         <!-- //pagination -->	
-		<p class="btn_line">
-		<a href="/board/write" class="btn_baseColor">등록</a>
+			<div class="pagination">
+				<c:if test="${pageVO.prev}">
+				<a href="/board/list?page=${pageVO.startPage-1}&searchType=${pageVO.searchType}&searchKeyword=${pageVO.searchKeyword}" class="prevpage  pbtn"><img src="/resources/home/img/btn_prevpage.png" alt="이전 페이지로 이동"></a>
+				</c:if>
+				<c:forEach begin="${pageVO.startPage}" end="${pageVO.endPage}" var="idx">
+				<a href="/board/list?page=${idx}&searchType=${pageVO.searchType}&searchKeyword=${pageVO.searchKeyword}"><span class='pagenum <c:out value="${idx==pageVO.page?'currentpage':''}"/>'>${idx}</span></a>
+				</c:forEach>
+				<c:if test="${pageVO.next}">
+				<a href="/board/list?page=${pageVO.endPage+1}&searchType=${pageVO.searchType}&searchKeyword=${pageVO.searchKeyword}" class="nextpage  pbtn"><img src="/resources/home/img/btn_nextpage.png" alt="다음 페이지로 이동"></a>
+				</c:if>
+			</div>
+			<!-- //pagination -->
+			<p class="btn_line">
+				<a href="/board/write" class="btn_baseColor">등록</a>
+			</p>
 		</div>
 		<!-- //bodytext_area -->
 
 	</div>
-	<!-- //container -->
+<!-- //container -->
 	
-	<%@ include file="../include/footer.jsp" %>
-	
+<%@ include file="../include/footer.jsp" %>

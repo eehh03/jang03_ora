@@ -1,4 +1,4 @@
-package org.edu.controller;
+﻿package org.edu.controller;
 
 import java.io.File;
 import java.text.DateFormat;
@@ -41,7 +41,7 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class HomeController {
 	
 	@Inject
-	private IF_MemberService memberService; //멤버이름 가져오려 추가
+	private IF_MemberService memberService;
 	
 	@Inject
 	private IF_BoardService boardService;
@@ -104,8 +104,6 @@ public class HomeController {
 			boardVO.setFiles(files);//데이터베이스 <-> VO(get,set) <-> DAO클래스
 			boardService.updateBoard(boardVO);
 		}//End if
-		
-		
 		rdat.addFlashAttribute("msg", "수정");
 		return "redirect:/board/view?bno=" + boardVO.getBno() + "&page=" + pageVO.getPage();
 	}
@@ -139,7 +137,13 @@ public class HomeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(value = "/board/view", method = RequestMethod.GET)
-	public String boardView(@ModelAttribute("pageVO") PageVO pageVO, @RequestParam("bno") Integer bno,Locale locale, Model model) throws Exception {
+	public String boardView(@ModelAttribute("pageVO") PageVO pageVO, @RequestParam("bno") Integer bno,Locale locale, Model model, HttpServletRequest request) throws Exception {
+		HttpSession session = request.getSession();
+		if(pageVO.getSearchBoard() != null) {
+			session.setAttribute("session_bod_type", pageVO.getSearchBoard());
+		} else {
+			pageVO.setSearchBoard((String) session.getAttribute("session_bod_type"));
+		}
 		BoardVO boardVO = boardService.viewBoard(bno);
 		//여기서 부터 첨부파일명 때문에 추가
 		List<String> files = boardService.selectAttach(bno);
@@ -163,7 +167,13 @@ public class HomeController {
 	 * @throws Exception 
 	 */
 	@RequestMapping(value = "/board/list", method = RequestMethod.GET)
-	public String boardList(@ModelAttribute("pageVO") PageVO pageVO, Locale locale, Model model) throws Exception {
+	public String boardList(@ModelAttribute("pageVO") PageVO pageVO, Locale locale, Model model, HttpServletRequest request) throws Exception {
+		HttpSession session = request.getSession();
+		if(pageVO.getSearchBoard() != null) {
+			session.setAttribute("session_bod_type", pageVO.getSearchBoard());
+		} else {
+			pageVO.setSearchBoard((String) session.getAttribute("session_bod_type"));
+		}
 		//PageVO pageVO = new PageVO();//매개변수로 받기전 테스트용
 		if(pageVO.getPage() == null) {
 			pageVO.setPage(1);//초기 page변수값 지정
@@ -177,7 +187,6 @@ public class HomeController {
 		model.addAttribute("pageVO", pageVO);
 		return "board/board_list";
 	}
-	
 	
 	/**
 	 * 스프링 시큐리티 secutiry-context.xml설정한 로그인 처리 결과 화면
@@ -294,37 +303,41 @@ public class HomeController {
 		
 		return "sample/home";
 	}
+	
 	/**
-	    * Simply selects the home view to render by returning its name.
-	    * 게시물과 이미지 출력
-	    * @throws Exception 
-	    */
-	   @RequestMapping(value = "/", method = RequestMethod.GET)
-	   public String home(Locale locale, Model model) throws Exception {
-	      PageVO pageVO = new PageVO();
-	      if(pageVO.getPage() == null) {
-	         pageVO.setPage(1);//초기 page변수값 지정
-	      }
-	      pageVO.setPerPageNum(5); //1페이지당 보여줄 게시물 강제지정
-	      pageVO.setTotalCount(boardService.countBno(pageVO));//강제로 입력한 값을 쿼리로 대체할 예정
-	      List<BoardVO> list = boardService.selectBoard(pageVO);
-	      
-	      //첨부파일 출력때문에 추가 Start
-	      List<BoardVO> boardListFiles = new ArrayList<BoardVO>();
-	      for(BoardVO vo:list) {
-	         List<String> files = boardService.selectAttach(vo.getBno());
-	         String[] filenames = new String[files.size()];
-	         int cnt = 0;
-	         for(String fileName : files) {//반복문안에 반복문
-	            filenames[cnt++] = fileName;
-	         }
-	         vo.setFiles(filenames);//여기까지는 view상세보기와 똑같음.
-	         boardListFiles.add(vo);//상세보기에서 추가된 항목
-	      }
-	      model.addAttribute("extNameArray", fileDataUtil.getExtNameArray());
-	      //첨부파일 출력때문에 추가 End
-	      
-	      model.addAttribute("boardList", boardListFiles);      
-	      return "home";
-	   }
+	 * Simply selects the home view to render by returning its name.
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/", method = RequestMethod.GET)
+	public String home(Locale locale, Model model) throws Exception {
+		PageVO pageVO = new PageVO();
+		if(pageVO.getPage() == null) {
+			pageVO.setPage(1);//초기 page변수값 지정
+		}
+		pageVO.setPerPageNum(5);//1페이지당 보여줄 게시물 수 강제지정
+		pageVO.setTotalCount(boardService.countBno(pageVO));//강제로 입력한 값을 쿼리로 대체OK.
+		
+		pageVO.setSearchBoard("gallery");
+		List<BoardVO> listGallery = boardService.selectBoard(pageVO);
+		pageVO.setSearchBoard("notice");
+		List<BoardVO> listNotice = boardService.selectBoard(pageVO);
+		//첨부파일 출력 때문에 추가 Start -- 갤러리에서만 필요
+		List<BoardVO> boardListFiles = new ArrayList<BoardVO>();
+		for(BoardVO vo:listGallery) {
+			List<String> files = boardService.selectAttach(vo.getBno());
+			String[] filenames = new String[files.size()];
+			int cnt = 0;
+			for(String fileName : files) {
+				filenames[cnt++] = fileName;
+			}
+			vo.setFiles(filenames);//여기까지는 view상세보기와 똑같다
+			boardListFiles.add(vo);//상세보기에서 추가된 항목
+		}
+		model.addAttribute("extNameArray", fileDataUtil.getExtNameArray());//첨부파일이 이미지인지 문서파일인 구분용 jsp변수
+		//첨부파일 출력 때문에 추가 End
+		model.addAttribute("boardListGallery", boardListFiles);
+		model.addAttribute("boardListNotice", listNotice);
+		return "home";
+	}
+	
 }

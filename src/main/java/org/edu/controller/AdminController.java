@@ -1,4 +1,4 @@
-package org.edu.controller;
+﻿package org.edu.controller;
 
 import java.io.File;
 import java.io.IOException;
@@ -9,12 +9,15 @@ import java.util.UUID;
 
 import javax.annotation.Resource;
 import javax.inject.Inject;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
 import org.edu.service.IF_BoardService;
 import org.edu.service.IF_MemberService;
 import org.edu.util.FileDataUtil;
+import org.edu.vo.BoardTypeVO;
 import org.edu.vo.BoardVO;
 import org.edu.vo.MemberVO;
 import org.edu.vo.PageVO;
@@ -40,15 +43,129 @@ public class AdminController {
 	
 	@Inject
 	private IF_MemberService memberService;
+	
 	@Inject
 	private FileDataUtil fileDataUtil;
+	
+	/**
+	 * 회원 아이디 체크 RestAPI.200805 주) @ResponseBody 사용됨
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/member/idcheck", method = RequestMethod.GET)
+	@ResponseBody
+	public int idCheck(@RequestParam("user_id") String user_id) throws Exception {
+		MemberVO memberVO = memberService.viewMember(user_id);
+		int check = 0; //쿼리 결과값이 존재하는지 체크하는 변수
+		if(memberVO!=null) {
+			check = 1;
+		}
+		return check;
+	}
+	
+	/**
+	 * 게시판아이디 체크 RestAPI.200805 주) @ResponseBody 사용됨
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/bodtype_check", method = RequestMethod.GET)
+	@ResponseBody
+	public int bodTypeCheck(@RequestParam("bod_type") String bod_type) throws Exception {
+		BoardTypeVO boardTypeVO = boardService.viewBoardType(bod_type);
+		//System.out.println("=====디버그=====" + boardTypeVO);
+		int check = 0; //쿼리 결과값이 존재하는지 체크하는 변수
+		if(boardTypeVO!=null) {
+			check = 1;
+		}
+		return check;
+	}
+	
+	/**
+	 * 게시판생성 insert폼.200804
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/write", method = RequestMethod.GET)
+	public String bodTypeInsert(Locale locale, Model model) throws Exception {
+		
+		return "admin/bodtype/bodtype_insert";
+	}
+	
+	/**
+	 * 게시판생성 insert.200804
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/write", method = RequestMethod.POST)
+	public String bodTypeInsert(BoardTypeVO boardTypeVO, Locale locale, RedirectAttributes rdat) throws Exception {
+		boardService.insertBoardType(boardTypeVO);
+		rdat.addFlashAttribute("msg","입력");
+		return "redirect:/admin/bodtype/list";
+	}
+	
+	/**
+	 * 게시판생성 수정폼만들기.200804
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/update", method = RequestMethod.GET)
+	public String bodTypeUpdate(@RequestParam("bod_type") String bod_type, Locale locale, Model model) throws Exception {
+		BoardTypeVO boardTypeVO = boardService.viewBoardType(bod_type);
+		model.addAttribute("bodTypeVO", boardTypeVO);
+		//boardTypeVO이 {'notice','공지사항',1}이런식으로 나옴
+		return "admin/bodtype/bodtype_update";
+	}
+	
+	/**
+	 * 게시판생성 실제수정.200804
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/update", method = RequestMethod.POST)
+	public String bodTypeUpdate(BoardTypeVO boardTypeVO, Locale locale, RedirectAttributes rdat) throws Exception {
+		boardService.updateBoardType(boardTypeVO);
+		rdat.addFlashAttribute("msg","수정");
+		return "redirect:/admin/bodtype/list";
+	}
+	
+	/**
+	 * 게시판생성 삭제.200804
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/delete", method = RequestMethod.POST)
+	public String bodTypeDelete(BoardTypeVO boardTypeVO, Locale locale, RedirectAttributes rdat) throws Exception {
+		boardService.deleteBoardType(boardTypeVO.getBod_type());
+		rdat.addFlashAttribute("msg","삭제");
+		return "redirect:/admin/bodtype/list";
+	}
+	
+	/**
+	 * 게시물생성 리스트 입니다.200803
+	 * @throws Exception 
+	 */
+	@RequestMapping(value = "/bodtype/list", method = RequestMethod.GET)
+	public String bodTypeList(Locale locale, Model model) throws Exception {
+		List<BoardTypeVO> list  = boardService.selectBoardType();
+		model.addAttribute("bodTypeList", list);
+		/** List<BoardTypeVO> list->jsp쪽 boardTypeList; 이데이터가 아래처럼 구성.
+		 * [
+		 * {'notice','공지사항',1},
+		 * {'gallery','공지사항',1},
+		 * ]
+		 */
+		return "admin/bodtype/bodtype_list";
+	}
 	
 	/**
 	 * 게시물관리 리스트 입니다.
 	 * @throws Exception 
 	 */
 	@RequestMapping(value = "/board/list", method = RequestMethod.GET)
-	public String boardList(@ModelAttribute("pageVO") PageVO pageVO, Locale locale, Model model) throws Exception {
+	public String boardList(@ModelAttribute("pageVO") PageVO pageVO, Locale locale, Model model, HttpServletRequest request) throws Exception {
+		//초기 메뉴를 클릭시 /admin/board/list?searchBoard=notice 데이터전송
+		HttpSession session = request.getSession();
+		if(pageVO.getSearchBoard() != null) {
+			//최초 세션 만들어짐
+			session.setAttribute("session_bod_type", pageVO.getSearchBoard());
+		} else {
+			//일반링크 클릭시 /admin/board/view?page=2...
+			//만들어진 세션 사용(아래)
+			pageVO.setSearchBoard((String) session.getAttribute("session_bod_type"));
+		}
 		//PageVO pageVO = new PageVO();//매개변수로 받기전 테스트용
 		if(pageVO.getPage() == null) {
 			pageVO.setPage(1);//초기 page변수값 지정

@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<footer>
+
+	<footer>
 		<div class="foot_area box_inner">
 			<ul class="foot_list clear">
 				<li><a href="/resources/home/javascript:;">이용약관</a></li>
@@ -99,4 +100,3 @@
 
 </body>
 </html>
-    

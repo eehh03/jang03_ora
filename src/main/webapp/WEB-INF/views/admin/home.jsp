@@ -1,6 +1,5 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-<!-- starter.jsp에서 가져옴 -->
 
 <%@ include file="include/header.jsp" %>
 
@@ -23,6 +22,14 @@
       </div><!-- /.container-fluid -->
     </div>
     <!-- /.content-header -->
- </div> <!-- /.content-wrapper -->
 
- <%@ include file="include/footer.jsp" %>
+    <!-- Main content -->
+    <div class="content">
+    
+    </div>
+    <!-- /.content -->
+  </div>
+  <!-- /.content-wrapper -->
+
+
+<%@ include file="include/footer.jsp" %> 

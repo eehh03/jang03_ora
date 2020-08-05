@@ -70,34 +70,33 @@
 			<h2>OOOO OOOOO 스프링 <b>TOP 3</b></h2>
 			<div class="about_box">
 				<ul class="place_list box_inner clear">
-						<c:forEach items="${boardList}" var="boardVO" varStatus="status">
+					<c:forEach items="${boardListGallery}" var="boardVO" varStatus="status">
 						<c:if test="${status.count <= 3}">
-					<li><a href="/board/view?bno=${boardVO.bno}&page=1" >
-					<!-- 첨부파일이 있을때 if-->
-					<c:if test="${boardVO.files[0] != null }">
-						<c:set var="extName" value="${fn:split(boardVO.files[0],'.')}" />
-						<c:set var="ext" value="${extName[fn:length(extName)-1]}" />
-						<!-- 진짜 이미지인가 아닌가는 위에서 확인. 첨부파일이 있는데 이미지일때와 이미지가 아닐때(구분하는것이 choose) -->
-						<c:choose>
-						<c:when test="${fn:containsIgnoreCase(extNameArray, ext)}">
-							<img src="/download?filename=${boardVO.files[0]}" title="첨부파일 이미지" style="width:100%;">
-						</c:when>
-						<c:otherwise>
-						<!-- 이미지 없으면 실행 -->
-						<img class="img_topplace" src="/resources/home/img/img_topplace01.jpg" alt="OOOO OOOOO" />	
-						</c:otherwise>
-						</c:choose>
+						<li><a href="/board/view?bno=${boardVO.bno}&page=1&searchBoard=gallery">
+								<!-- 첨부파일이 있을때 if -->
+								<c:if test="${boardVO.files[0] != null }">
+									<c:set var="extName" value="${fn:split(boardVO.files[0],'.')}" />
+									<c:set var="ext" value="${extName[fn:length(extName)-1]}" />
+									<!-- 첨부파일이 있는데 이미지일때와 이미지가 아닐때 choose -->
+									<c:choose>
+										<c:when test="${fn:containsIgnoreCase(extNameArray, ext)}">
+											<img src="/download?filename=${boardVO.files[0]}" title="첨부파일 이미지" style="width:100%;">
+										</c:when>
+										<c:otherwise>
+											<img class="img_topplace" src="/resources/home/img/img_topplace01.jpg" alt="이미지 없음" />
+										</c:otherwise>
+									</c:choose>
+								</c:if>
+								<!-- 첨부파일이 없을때 if -->
+								<c:if test="${boardVO.files[0] == null }">
+									<img class="img_topplace" src="/resources/home/img/img_topplace01.jpg" alt="이미지 없음" />
+								</c:if>
+								
+								<h3>${boardVO.title}</h3>
+								<p class="txt">${boardVO.content}</p>
+								<span class="view">VIEW</span></a>
+						</li>
 						</c:if>
-						<!-- 첨부파일이 없을때 if -->
-					<c:if test="${boardVO.files[0] == null }">
-						<img class="img_topplace" src="/resources/home/img/img_topplace01.jpg" alt="OOOO OOOOO" />	
-					</c:if>
-					
-					<h3>${boardVO.title}</h3>
-					<p class="txt">${boardVO.content}</p>
-					<span class="view">VIEW</span></a>
-					</li>
-					</c:if>
 					</c:forEach>
 				</ul>
 			</div>
@@ -113,10 +112,10 @@
 					<a href="/resources/home/javascript:;">전화 상담 신청</a>
 				</p>
 				<div class="bbs_line">
-					<h3><a href="/board/list">NOTICE</a></h3>
+					<h3><a href="/board/list?searchBoard=notice">NOTICE</a></h3>
 					<ul class="notice_recent">
-					<c:forEach items="${boardList}" var="boardVO" varStatus="status">
-					<li><a href="/board/view?bno=${boardVO.bno}&page=1">${boardVO.title}</a></li>
+					<c:forEach items="${boardListNotice}" var="boardVO" varStatus="status">
+						<li><a href="/board/view?bno=${boardVO.bno}&page=1&searchBoard=notice">${boardVO.title}</a></li>
 					</c:forEach>
 					</ul>
 				</div>
@@ -125,6 +124,5 @@
 		<!-- //app_area -->
 		
 	</div>
-	<!-- //container -->
-	<%@ include file="include/footer.jsp" %>
-	
+	<!-- //Content Wrapper -->
+<%@ include file="include/footer.jsp" %>

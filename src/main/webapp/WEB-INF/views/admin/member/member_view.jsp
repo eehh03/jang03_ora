@@ -1,9 +1,9 @@
 <%@ page language="java" contentType="text/html; charset=UTF-8"
     pageEncoding="UTF-8"%>
-   <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %> 
+<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ include file="../include/header.jsp" %>
 
-		<!-- Content Wrapper. Contains page content -->
+<!-- Content Wrapper. Contains page content -->
 		<div class="content-wrapper">
 			<!-- Content Header (Page header) -->
 			<div class="content-header">
@@ -37,7 +37,7 @@
 									<div class="col-sm-12">
 										<!-- text input -->
 										<div class="form-group">
- 										<label>user_id</label> <br> ${memberVO.user_id}
+											<label>user_id</label> <br> ${memberVO.user_id}
 										</div>
 									</div>
 
@@ -80,7 +80,7 @@
 									<a href="/admin/member/list?page=${pageVO.page}" class="btn btn-primary">LIST ALL</a>
 								</div>
 								</div>
-								<input type="hidden" name="user_id" value="${memberVO.user_id}">
+							<input type="hidden" name="user_id" value="${memberVO.user_id}" >	
 							</form>
 						</div>
 						<!-- /.content-header -->
@@ -89,8 +89,10 @@
 						<div class="content"></div>
 						<!-- .content  -->
 					</div>
+					
 				</div>
 			</div>
 		</div>
-		<!-- ./Content Wrapper -->
-<%@ include file="../include/footer.jsp" %>
+		<!-- ./Contents Wrap -->
+
+<%@ include file="../include/footer.jsp" %> 
